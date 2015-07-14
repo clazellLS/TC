@@ -1,9 +1,9 @@
-exports.getExactaDividend = function (exactaArray, winningNumber, secondNumber) {
+exports.getExactaDividend = function (exactaArray, winningNumber, secondNumber,next) {
   var exwin = exactaArray.filter(function (value) {
     return value.selectionOne == winningNumber && value.selectionTwo == secondNumber;
   }).reduce(addStakes, 0);
   var pool = exactaArray.reduce(addStakes, 0);
-  return (getPoolAfterCommission(pool, 18) / exwin).toFixed(2);
+  next(null, (getPoolAfterCommission(pool, 18) / exwin).toFixed(2));
 }
 
 function addStakes(previusValue, currentobject) {

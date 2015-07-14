@@ -39,8 +39,10 @@ describe('Win', function () {
 		{ selection: 1, stake: 16 }, { selection: 2, stake: 8 }, { selection: 3, stake: 22 }, { selection: 4, stake: 57 },
 		{ selection: 1, stake: 42 }, { selection: 2, stake: 98 }, { selection: 3, stake: 63 }, { selection: 4, stake: 15 }]
 	it('Should be the correct output', function () {
-		var winning = win.getWinDividends(arr, 2);
-		expect(winning).to.equal('2.61');
+		win.getWinDividends(arr, 2, function (err, result) {
+			expect(result).to.equal('2.61');
+		});
+
 	});
 });
 
@@ -59,8 +61,9 @@ describe('Exacta', function () {
 		{ selectionOne: 1, selectionTwo: 3, stake: 93 },
 		{ selectionOne: 3, selectionTwo: 2, stake: 51 }]
 	it('Should be the correct output', function () {
-		var win = Exacta.getExactaDividend(arr, 2, 3);
-		expect(win).to.equal('2.43');
+		Exacta.getExactaDividend(arr, 2, 3, function (err, result) {
+			expect(result).to.equal('2.43');
+		});
 	});
 });
 
@@ -69,12 +72,15 @@ describe('Place', function () {
 		{ selection: 1, stake: 40 }, { selection: 2, stake: 16 }, { selection: 3, stake: 82 }, { selection: 4, stake: 52 },
 		{ selection: 1, stake: 18 }, { selection: 2, stake: 74 }, { selection: 3, stake: 39 }, { selection: 4, stake: 105 }]
 	it('Should be the correct output', function () {
-		var winning = place.getPlaceDivdend(arr, 2);
-		expect(winning).to.equal('1.06');
-		var second = place.getPlaceDivdend(arr, 3);
-		expect(second).to.equal('1.27');
-		var third = place.getPlaceDivdend(arr, 1);
-		expect(third).to.equal('2.13');
+		place.getPlaceDivdend(arr, 2, function (err, result) {
+			expect(result).to.equal('1.06');
+		});
+		place.getPlaceDivdend(arr, 3, function (err, result) {
+			expect(result).to.equal('1.27');
+		});
+		place.getPlaceDivdend(arr, 1, function (err, result) {
+			expect(result).to.equal('2.13');
+		});
 	});
 
 });

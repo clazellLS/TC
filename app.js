@@ -18,13 +18,12 @@ function getInputType(line) {
   inputVal.validate(line, function (err, result) {
     if (err) {
       return console.error(err);
-    }else {
-      console.log(result)
+    } else {
       var data = result.split(':');
       switch (data[0]) {
         case 'Result':
-          printResultsToSTDOUT(data[1], data[2], data[3]);
-          process.exit()
+          printResultsToSTDOUT(parseInt(data[1]), parseInt(data[2]), parseInt(data[3]));
+           process.exit()
           break;
         case 'Bet':
           placeBet(data[1], data[3], data[2]);
@@ -53,7 +52,7 @@ function placeBet(betType, stake, selection) {
       exactaStakes.push({
         selectionOne: horses[0],
         selectionTwo: horses[1],
-        stake: stake
+        stake: inputVal.validateAndParseInt(stake)
       });
       break;
     default:
@@ -63,9 +62,19 @@ function placeBet(betType, stake, selection) {
 
 function printResultsToSTDOUT(winningNumber, secondNumber, thirdNumber) {
   process.stdout.write('\n');
-  process.stdout.write('Win:' + winningNumber + ":$" + win.getWinDividends(winPlaceStake, winningNumber) + '\n');
-  process.stdout.write('Place:' + winningNumber + ":$" + place.getPlaceDivdend(PlaceStake, winningNumber) + '\n');
-  process.stdout.write('Place:' + secondNumber + ":$" + place.getPlaceDivdend(PlaceStake, secondNumber) + '\n');
-  process.stdout.write('Place:' + thirdNumber + ":$" + place.getPlaceDivdend(PlaceStake, thirdNumber) + '\n');
-  process.stdout.write('Exacta:' + winningNumber + "," + secondNumber + ":$" + Exacta.getExactaDividend(exactaStakes, winningNumber, secondNumber) + '\n');
+  win.getWinDividends(winPlaceStake, winningNumber, function (err, result) {
+    process.stdout.write('Win:' + winningNumber + ":$" + result + '\n');
+  })
+  place.getPlaceDivdend(PlaceStake, winningNumber, function (err, result) {
+    process.stdout.write('Place:' + winningNumber + ":$" + result + '\n');
+  })
+  place.getPlaceDivdend(PlaceStake, secondNumber, function (err, result) {
+    process.stdout.write('Place:' + secondNumber + ":$" + result + '\n');
+  })
+  place.getPlaceDivdend(PlaceStake, thirdNumber, function (err, result) {
+    process.stdout.write('Place:' + thirdNumber + ":$" + result + '\n');
+  })
+  Exacta.getExactaDividend(exactaStakes, winningNumber, secondNumber, function (err, result) {
+    process.stdout.write('Exacta:' + winningNumber + "," + secondNumber + ":$" + result + '\n');
+  })
 }

@@ -7,7 +7,7 @@ exports.validate = function (line, next) {
 	}
 }
 
-exports.validateAndParseInt = function (valueToParse) {
+exports.validateAndParseInt = function (valueToParse,next) {
 	if (valueToParse !== null) {
 		if (valueToParse.length > 0) {
 			if (!isNaN(valueToParse)) {

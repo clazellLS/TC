@@ -9,6 +9,7 @@ var Exacta = require('./libs/Exacta.js');
 var inputVal = require('./libs/input.js');
 
 mongoose.connect('mongodb://tc:tctote@ds059712.mongolab.com:59712/tote');
+
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
@@ -18,42 +19,61 @@ process.stdin.resume();
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', function (line) {
 
-  var data = inputVal.validate(line).split(':');
-  switch (data[0]) {
-    case 'Result':
-      getResults(data, function () {
-        exitAndDropCollection('exactas');
-        exitAndDropCollection('places');
-        exitAndDropCollection('places');
-      });
-      break;
-    case 'Bet':
-      placeBet(data[1], data[3], data[2]);
-      break;
-    default:
-      throw new Error('Enter a real value');
-  }
+  inputVal.validate(line, function (err, result) {
+    if (err) {
+      return console.error(err);
+    } else {
+      var data = result.split(':');
+      switch (data[0]) {
+        case 'Result':
+          getResults(data, function (err, res) {
+            if (err) return console.error(err);
+            if (res) {
+              exitAndDropCollection('Wins');
+              exitAndDropCollection('places');
+              exitAndDropCollection('exactas');
+            }
+          });
+          break;
+        case 'Bet':
+          placeBet(data[1], data[3], data[2]);
+          break;
+        default:
+          throw new Error('Enter a real value');
+      }
+    }
+  })
+
+
 });
 
 function getResults(data) {
   process.stdout.write('\n');
   WinModel.find({ 'betType': 'W' }, 'selection stake', function (err, allBets) {
     if (err) return console.error(err);
-    process.stdout.write('Win:' + data[1] + ":$" + win.getWinDividends(allBets, data[1]) + '\n');
+    win.getWinDividends(allBets, data[1], function (err, result) {
+      process.stdout.write('Win:' + data[1] + ":$" + result + '\n');
+    })
   })
   PlaceModel.find({ 'betType': 'P' }, 'selection stake', function (err, allBets) {
     if (err) return console.error(err);
-    process.stdout.write('Place:' + data[1] + ":$" + place.getPlaceDivdend(allBets, data[1]) + '\n');
-    process.stdout.write('Place:' + data[2] + ":$" + place.getPlaceDivdend(allBets, data[2]) + '\n');
-    process.stdout.write('Place:' + data[3] + ":$" + place.getPlaceDivdend(allBets, data[3]) + '\n');
-
+    place.getPlaceDivdend(allBets, data[1], function (err, result) {
+      process.stdout.write('Place:' + data[1] + ":$" + result + '\n');
+    })
+    place.getPlaceDivdend(allBets, data[2], function (err, result) {
+      process.stdout.write('Place:' + data[2] + ":$" + result + '\n');
+    })
+    place.getPlaceDivdend(allBets, parseInt(data[3]), function (err, result) {
+      process.stdout.write('Place:' + parseInt(data[3]) + ":$" + result + '\n');
+    })
   })
   ExactaModel.find({ 'betType': 'E' }, 'selectionOne selectionTwo stake', function (err, allBets) {
     if (err) return console.error(err);
-    function getResults(data) {
-      process.stdout.write('Exacta:' + data[1] + "," + data[2] + ":$" + Exacta.getExactaDividend(allBets, data[1], data[2]) + '\n');
-    }
+      Exacta.getExactaDividend(allBets, data[1] , data[2], function (err, result) {
+        process.stdout.write('Exacta:' + data[1] + "," + data[2] + ":$" + result + '\n');
+      })
   })
+  return true;
 }
 function placeBet(betType, stake, selection) {
   switch (betType) {
