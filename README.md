@@ -20,6 +20,11 @@ Enter input into the command line, the app will accept input until the result ha
 Input can be copy and pasted or entered one line at a time.
 Accepted input:
 
+#TESTS
+Tests are run with.
+
+	"mocha test.js""
+
 # INPUTS
 All bet inputs should be in the format:
 
